@@ -99,7 +99,7 @@ Step 3: Questions
 + Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
 + Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table)
 
-__## NY NOAA__
+__## Problem 3: NY NOAA__
 
 Step 1: Import the dataset using the p8105 library(done in problem 1):
 
