@@ -140,7 +140,7 @@ instacart
 ```
 Step 2: Exploratory Analysis 
 
-The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. 
+_The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. _
 
 The size of the dataset is `dim(instacart)`. This set contains information about orders (time ordered, day of week, ID number), products ordered (name of product, department), and customers (order frequency). 
 
@@ -154,19 +154,22 @@ instacart %>%
     group_by(aisle_id) %>%
     summarize(n = n())
 
-#summarizing orders by freq of isle count
-cart = instacart %>%
-    group_by(aisle) %>%
-    summarize(n = n()) %>%
-    filter(n, desc = TRUE)
+top_cart = instacart %>%
+  group_by(aisle_id) %>%  
+  summarise(n = n()) %>%
+  top_n(3)  
+
+top_cart
 ```
+There are 134 aisles, the most popular of which are aisles 83, 24, and 123. 
+
 + Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
 
 ```{r table2}
 instacart %>%
   group_by(aisle) %>%
   summarize(n = n()) %>%
-  ggplot(aes(x = aisle , y = n, color = aisle)) + geom_point() + theme(axis.text.x = element_text(angle = 90, size = 5))
+  ggplot(aes(x = aisle , y = n, color = aisle)) + geom_point() + theme(axis.text.x = element_text(angle = 90, size = 3))
 
 ```
 + Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
@@ -215,15 +218,68 @@ Step 2: Exploratory Analysis
 
 The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue.
 
-
+The size of the dataset is `dim(ny_noaa)`. This set contains information about the date (with its identifier), the amount of precipitation, and the amount of snow from tthe years 2007 to 2010. 
 
 Step 3: Questions 
 
 + Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
+
+```{r clean_noaa}
+clean_noaa = ny_noaa %>%
+  janitor::clean_names() %>%
+  na.omit() %>%
+  separate(date, into = c("year", "month", "day"), sep = "-") %>%
+  mutate(tmin = as.numeric(tmin)) %>%
+  mutate(tmax = as.numeric(tmax)) 
+
+snow = clean_noaa %>%
+  group_by(snow) %>%  
+  summarise(n = n()) %>%
+  top_n(3)  
+
+snow
+```
+The most common amount of snow on a givn day in New York is 0 units. This makes sense because it is normally not snowing in New York, out of the 365 days per year. 
+
 + Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+```{r jan_v_july}
+jan_july = clean_noaa %>%
+    select(year, month, id, tmin, tmax) %>%
+    filter(month == '01' | month == '07') %>%
+    mutate(year = as.factor(year)) %>%
+    group_by(year, month, id) %>% 
+    summarize(month_mean = mean(tmax)) %>%
+    ggplot(aes(x = year, y = month_mean)) + geom_boxplot() + facet_grid(.~ month) + theme(axis.text.x = element_text(angle = 90))
+jan_july
+```
+Within this two panel comparison, we can see the average precipitation for each year. 
+
 + Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
+```{r 3i+ii}
+#setup 
+library(ggplot2)
+library(patchwork)
 
+#part 1
+min_max = clean_ny_noaa %>%
+  select(tmin, tmax) 
+
+min_max_plot = ggplot(min_max, aes(x = tmin, y = tmax)) + geom_hex()
+min_max_plot 
+
+#part 2
+snowfall = clean_ny_noaa %>%
+    select(year, snow) %>%
+    filter(snow < 100, snow > 0) 
+    
+snowfall_plot = ggplot(snowfall, aes(x = year, y = snow)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 90))
+
+snowfall_plot
+
+min_max_plot + snowfall_plot
+```
 
 
 
