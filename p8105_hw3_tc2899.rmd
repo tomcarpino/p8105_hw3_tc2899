@@ -27,7 +27,7 @@ library(patchwork)
 library(ggridges)
 ```
 
-Step 2: Data Cleaning 
+_Step 2: Data Cleaning_ 
 
 + format the data to use appropriate variable names;
 + focus on the “Overall Health” topic
@@ -35,6 +35,7 @@ Step 2: Data Cleaning
 
 Data Cleaning: 
 ```{r cleaning}
+#here I am cleaning the data and renaming the variables
 brfss <- brfss_smart2010 %>%
   janitor::clean_names() %>%
   select(year, locationdesc, topic, response, data_value) %>%
@@ -46,7 +47,7 @@ brfss <- brfss_smart2010 %>%
   mutate(`Overall Health Response` = as.factor(`Overall Health Response`))  
 ```
 
-*The organizing responses from "Excellent" to "Poor" not successful:*
+*The organizing responses from "Excellent" to "Poor" not successfu so I did not include this but I am including what I tried below:*
 
 ```{r sorting}
 # sort.brfss <- brfss %>% 
@@ -69,10 +70,12 @@ In 2002, 3 states were observed in 7 counties, including CT, FL, and NC.
 __Make a “spaghetti plot” that shows the number of locations in each state from 2002 to 2010.__
 
 ```{r spaghetti}
+#grouping first 
 brfss_plot = brfss %>%
   group_by(year, state) %>%
   summarize(number = n())
 
+#plotting using the viridis package-- didn't really change much 
 ggplot(data = brfss_plot, aes(x = year, y = number, color = state)) + geom_line() + labs(title = "Spaghetti Plot for Observations by State, 2002-2010") + viridis::scale_color_viridis(
     name = "state", 
     discrete = TRUE
@@ -82,6 +85,7 @@ ggplot(data = brfss_plot, aes(x = year, y = number, color = state)) + geom_line(
 __Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.__
 
 ```{r table}
+#plotting the mean and st data across NY stat
 brfss_2002_2006_2010 = brfss %>%
   filter(state == "NY") %>%
   filter(year == '2002' | year == '2006' | year == '2010') %>%
@@ -109,7 +113,7 @@ brfss_avg_prop
 Make a five-panel plot that shows, for each response category separately, the distribution of these state-level averages over time__
 
 ```{r 5panel}
-
+#creating the 5 panel plo, using the viridis color technique... which did not change things really but still including it
 brfss %>%
   mutate(year = as.factor(year)) %>%
   group_by(year, state, `Overall Health Response`) %>%
@@ -136,6 +140,7 @@ Step 1: Import the dataset using the p8105 library(done in problem 1):
 instacart = instacart %>%
   janitor::clean_names() 
 
+#showing myself what the data looks like
 instacart
 ```
 Step 2: Exploratory Analysis 
@@ -154,6 +159,7 @@ instacart %>%
     group_by(aisle_id) %>%
     summarize(n = n())
 
+#identifying the top three aisles using summary data
 top_cart = instacart %>%
   group_by(aisle_id) %>%  
   summarise(n = n()) %>%
@@ -166,6 +172,7 @@ There are 134 aisles, the most popular of which are aisles 83, 24, and 123.
 + Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
 
 ```{r table2}
+#I made the plot but the aisles aren't very easily read
 instacart %>%
   group_by(aisle) %>%
   summarize(n = n()) %>%
@@ -180,11 +187,12 @@ pop_aisles = instacart %>%
   select(product_name, aisle) %>% 
   group_by(aisle, product_name) %>%
   summarise(n = n()) %>%
-  arrange(desc(n)) #to sort highest to lowest the #(n) of each product within aisles
+  arrange(desc(n)) 
+#to sort highest to lowest the #(n) of each product within aisles
 
 pop_aisles
 
-#to collapse repeat aisles and only show the top 1
+#to only show the top 1 aisles and its most popular product  
 pop_items = pop_aisles %>%
     group_by(aisle) %>%
     top_n(1)
@@ -199,7 +207,7 @@ apple_icecream = instacart %>%
   mutate(order_dow = as.character(order_dow)) %>%
   mutate(order_dow = recode(order_dow, `0` = "0:Sunday", `1` = "1:Monday", `2` = "2:Tuesday", `3` ="3:Wednesday", `4` = "4:Thursday", `5` = "5:Friday", `6` = "6:Saturday")) %>%
   group_by(order_dow, product_name) %>%
-  #recode(order_dow, `0` = "Sunday", 1 = "Monday", 2 = "Tuesday", 3 ="Wednesday", 4 = "Thursday", 5 = "Friday", 6 = "Saturday") %>% 
+  #recoding (order_dow, `0` = "Sunday", 1 = "Monday", 2 = "Tuesday", 3 ="Wednesday", 4 = "Thursday", 5 = "Friday", 6 = "Saturday") %>% 
   summarize(mean_hr = mean(order_hour_of_day)) %>%
   spread(key = order_dow, value = mean_hr) %>%
   knitr::kable(digits = 1)
@@ -211,6 +219,7 @@ __## Problem 3: NY NOAA__
 Step 1: Import the dataset using the p8105 library(done in problem 1):
 
 ```{r q3_setup} 
+#showing myself dataset
 ny_noaa
 ```
 
@@ -225,6 +234,7 @@ Step 3: Questions
 + Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
 
 ```{r clean_noaa}
+#cleaning dataset
 clean_noaa = ny_noaa %>%
   janitor::clean_names() %>%
   na.omit() %>%
@@ -232,6 +242,7 @@ clean_noaa = ny_noaa %>%
   mutate(tmin = as.numeric(tmin)) %>%
   mutate(tmax = as.numeric(tmax)) 
 
+#creating new dataset of snow amount 
 snow = clean_noaa %>%
   group_by(snow) %>%  
   summarise(n = n()) %>%
@@ -244,13 +255,15 @@ The most common amount of snow on a givn day in New York is 0 units. This makes 
 + Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
 
 ```{r jan_v_july}
+#creating new dataset 
 jan_july = clean_noaa %>%
     select(year, month, id, tmin, tmax) %>%
     filter(month == '01' | month == '07') %>%
     mutate(year = as.factor(year)) %>%
     group_by(year, month, id) %>% 
     summarize(month_mean = mean(tmax)) %>%
-    ggplot(aes(x = year, y = month_mean)) + geom_boxplot() + facet_grid(.~ month) + theme(axis.text.x = element_text(angle = 90))
+    ggplot(aes(x = year, y = month_mean)) + geom_boxplot() + labs(title = "Avg max temperature in January and July, 1981-2010") + facet_grid(.~ month) + theme(axis.text.x = element_text(angle = 90))
+#showing self dataset 
 jan_july
 ```
 Within this two panel comparison, we can see the average precipitation for each year. 
