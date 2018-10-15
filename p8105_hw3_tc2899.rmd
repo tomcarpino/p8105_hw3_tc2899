@@ -120,12 +120,8 @@ brfss %>%
   summarize(mean = mean(`Overall Health Value`)) %>%
   ggplot(aes(x = year, y = mean)) +
   geom_boxplot() + 
-  labs(
-    title = "Mean Health Value by Year",
-    x = "Year",
-    y = "Mean Health Value",
-    caption = "Data from BRFSS"
-  ) + 
+  labs( title = "Mean Health Value by Year", x = "Year", y = "Mean Health Value", caption = "Data from BRFSS"
+) + 
   facet_grid(~`Overall Health Response`) + theme(axis.text.x = element_text(angle = 90)) + viridis::scale_color_viridis(
     name = "Overall Health Value", 
     discrete = TRUE
@@ -176,7 +172,7 @@ There are 134 aisles, the most popular of which are aisles 83, 24, and 123.
 instacart %>%
   group_by(aisle) %>%
   summarize(n = n()) %>%
-  ggplot(aes(x = aisle , y = n, color = aisle)) + geom_point() + theme(axis.text.x = element_text(angle = 90, size = 3))
+  ggplot(aes(x = aisle , y = n, color = aisle)) + geom_point() + labs(title = "Number of items ordered in each aisle") + theme(axis.text.x = element_text(angle = 90, size = 3))
 
 ```
 + Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
@@ -279,7 +275,7 @@ library(patchwork)
 min_max = clean_noaa %>%
   select(tmin, tmax) 
 
-min_max_plot = ggplot(min_max, aes(x = tmin, y = tmax)) + geom_hex()
+min_max_plot = ggplot(min_max, aes(x = tmin, y = tmax)) + geom_hex() + labs(title = "tmax vs tmin for the full dataset")
 min_max_plot 
 
 #part 2
@@ -287,7 +283,7 @@ snowfall = clean_noaa %>%
     select(year, snow) %>%
     filter(snow < 100, snow > 0) 
     
-snowfall_plot = ggplot(snowfall, aes(x = year, y = snow)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 90))
+snowfall_plot = ggplot(snowfall, aes(x = year, y = snow)) + geom_boxplot() + labs(title = "plot showing both tmax v tmin and distribution of snowfall values 0<x<100") + theme(axis.text.x = element_text(angle = 90))
 
 snowfall_plot
 
