@@ -263,14 +263,14 @@ library(ggplot2)
 library(patchwork)
 
 #part 1
-min_max = clean_ny_noaa %>%
+min_max = clean_noaa %>%
   select(tmin, tmax) 
 
 min_max_plot = ggplot(min_max, aes(x = tmin, y = tmax)) + geom_hex()
 min_max_plot 
 
 #part 2
-snowfall = clean_ny_noaa %>%
+snowfall = clean_noaa %>%
     select(year, snow) %>%
     filter(snow < 100, snow > 0) 
     
